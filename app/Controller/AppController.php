@@ -31,4 +31,42 @@ App::uses('Controller', 'Controller');
  * @link		https://book.cakephp.org/2.0/en/controllers.html#the-app-controller
  */
 class AppController extends Controller {
+    public $components = [
+        'Flash',
+        'Auth' => [
+            'authError'      => 'You must be logged in to view this page.',
+            'loginError'     => 'Invalid Username or Password entered, please try again.',
+            'authenticate'   => [
+                'Form' => [
+                    'passwordHasher' => 'Blowfish',
+                    'fields' => [
+                        'username' => 'username',
+                        'password' => 'password'
+                    ]
+                ]
+            ]
+        ],
+        'Session'
+    ];
+    public function beforeFilter() {
+        //datasource for transaction
+        $this->dataSource = ConnectionManager::getDataSource('default');
+        $this->Auth->allow('add');
+    }
+
+    /**
+    * get $dataSource
+    * @return $this->dataSource's name
+    */
+    public function getDataSourceName(){
+        return ConnectionManager::getSourceName($this->dataSource);
+    }
+
+    /**
+    * get $dataSource
+    * @return $this->dataSource
+    */
+    public function getDataSource(){
+        return $this->dataSource;
+    }
 }
