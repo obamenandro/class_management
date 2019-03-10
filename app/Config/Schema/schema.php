@@ -49,7 +49,7 @@ class AppSchema extends CakeSchema {
             'comment' =>'Address'
         ],
         'contact' => [
-            'type'     => 'integer', 
+            'type'     => 'biginteger', 
             'null'     => false, 
             'default'  => null, 
             'unsigned' => false

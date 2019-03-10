@@ -23,8 +23,6 @@ class InstructorsController extends AppController {
      * Add instructor
      */
     public function add() {
-        $this->autoRender = false;
-        $this->layout = false;
         if ($this->request->is('post')) {
             try {
                 $data = $this->request->data;
@@ -130,7 +128,7 @@ class InstructorsController extends AppController {
         ];
         if ($this->request->is('post')) {
             $data = $this->request->data;
-            if ($this->Auth->login($data)) {
+            if ($this->Auth->login()) {
                 $response = [
                     'status' => 'success',
                     'message' => 'Successfully login.'
