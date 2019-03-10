@@ -21,6 +21,7 @@
 
 App::uses('Controller', 'Controller');
 
+
 /**
  * Application Controller
  *
@@ -48,25 +49,27 @@ class AppController extends Controller {
         ],
         'Session'
     ];
-    public function beforeFilter() {
-        //datasource for transaction
-        $this->dataSource = ConnectionManager::getDataSource('default');
-        $this->Auth->allow('add');
-    }
-
     /**
     * get $dataSource
     * @return $this->dataSource's name
     */
-    public function getDataSourceName(){
-        return ConnectionManager::getSourceName($this->dataSource);
-    }
-
+    // public function getDataSourceName(){
+    //     return ConnectionManager::getSourceName($this->dataSource);
+    // }
+    
     /**
     * get $dataSource
     * @return $this->dataSource
     */
-    public function getDataSource(){
-        return $this->dataSource;
+    // public function getDataSource(){
+    //     return $this->dataSource;
+    // }
+
+    public function beforeFilter() {
+        $this->Auth->allow('add', 'login');
+        $this->autoRender = false;
+        //datasource for transaction
+        // $this->dataSource = ConnectionManager::getDataSource('default');
     }
+
 }

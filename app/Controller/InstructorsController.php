@@ -8,34 +8,47 @@ App::uses('AppController', 'Controller');
  */
 class InstructorsController extends AppController {
 
-/**
- * Components
- *
- * @var array
- */
+    /**
+     * Components
+     *
+     * @var array
+     */
     public $components = array('Paginator');
 
+    public function beforeFilter() {
+        parent::beforeFilter();
+        $this->Auth->allow('login','logout','add','edit', 'delete');
+    }
     /**
      * Add instructor
      */
     public function add() {
         $this->autoRender = false;
-        if ($this->request->data('ajax')) {
+        $this->layout = false;
+        if ($this->request->is('post')) {
             try {
-                $this->dataSource->begin();
                 $data = $this->request->data;
                 if ($this->Instructor->save($data)) {
-                    $this->dataSource->commit();
-                    return json_encode(['status' => 'success']);
-                } else {
-                    $this->dataSource->rollback();
-                    return json_encode(['status' => 'failed']);
-                }
+                    $response = [
+                        'status' => 'success',
+                        'message' => 'Instructor has been successfully saved.'
+                    ];
+                } 
             } catch (Exception $e) { 
-                $this->dataSource->rollback();
-                return json_encode(['status' => 'failed']);
+                $response = [
+                    'status' => 'failed',
+                    'message' => 'Instructor has been failed to saved.'
+                ];
             }
+        } else {
+            $response = [
+                'status' => 'failed',
+                'message' => 'HTTP method not allowed.'
+            ];
         }
+        $this->response->type('application/json');
+        $this->response->body(json_encode($response));
+        return $this->response->send();
     }
 
     /**
@@ -43,22 +56,29 @@ class InstructorsController extends AppController {
      * param $id instructor_id
      */
     public function edit($id) {
+        $response = [
+            'status' => 'failed',
+            'message' => 'HTTP method not allowed.'
+        ];
         if ($this->request->is(['put', 'post'])) {
             try {
-                $this->dataSource->begin();
                 $data = $this->request->data;
                 $this->Instructor->id = $id;
                 if ($this->Instructor->save($data)) {
-                    $this->dataSource->commit();
-                    return json_encode(['status' => 'success']);
-                } else {
-                    $this->dataSource->rollback();
-                    return json_encode(['status' => 'failed']);
+                    $response = [
+                        'status' => 'success',
+                        'message' => 'Instructor has been successfully updated.'
+                    ];
                 }
             } catch (Exception $e) {
-                $this->dataSource->rollback();
-                return json_encode(['status' => 'failed']);
+                $response = [
+                    'status' => 'failed',
+                    'message' => 'Instructor has been failed to update.'
+                ];
             }
+            $this->response->type('application/json');
+            $this->response->body(json_encode($response));
+            return $this->response->send();
         }
     }
     /**
@@ -73,17 +93,70 @@ class InstructorsController extends AppController {
             ]
         ]);
         if (!empty($instructor)) {
-            return json_encode(['status' => 'failed', 'message' => 'invalid instructor']);
-        } 
-        $data['Instructor'] = [
-            'id' => $id,
-            'deleted' => 1,
-            'deleted_date' => date('Y-m-d')
-        ];
-        if ($this->Instructor->save($data)) {
-            return json_encode(['status' => 'success']);
+            $response = [
+                'status' => 'failed',
+                'message' => 'Instructor is not exists.'
+            ];
         } else {
-            return json_encode(['status' => 'failed']);
+            $data['Instructor'] = [
+                'id' => $id,
+                'deleted' => 1,
+                'deleted_date' => date('Y-m-d')
+            ];
+            if ($this->Instructor->save($data)) {
+                $response = [
+                    'status' => 'success',
+                    'message' => 'Instructor has been successfully deleted.'
+                ];
+            } else {
+                $response = [
+                    'status' => 'failed',
+                    'message' => 'Instructor has been failed to delete.'
+                ];
+            }
         }
+        $this->response->type('application/json');
+        $this->response->body(json_encode($response));
+        return $this->response->send();
+    }
+
+    /**
+     * Instructor Login 
+     */
+    public function login() {
+        $response = [
+            'status' => 'failed',
+            'message' => 'HTTP method not allowed.'
+        ];
+        if ($this->request->is('post')) {
+            $data = $this->request->data;
+            if ($this->Auth->login($data)) {
+                $response = [
+                    'status' => 'success',
+                    'message' => 'Successfully login.'
+                ];
+            } else {
+                $response = [
+                    'status' => 'failed',
+                    'message' => 'Invalid Username or Password entered, please try again.'
+                ];
+            }
+        }
+        $this->response->type('application/json');
+        $this->response->body(json_encode($response));
+        return $this->response->send();
+    }
+
+    public function logout() {
+        $this->autoRender = false;
+        if ($this->Auth->logout()) {
+            $response = [
+                'status' => 'success',
+                'message' => 'Logout'
+            ];
+        }
+        $this->response->type('application/json');
+        $this->response->body(json_encode($response));
+        return $this->response->send();
     }
 }

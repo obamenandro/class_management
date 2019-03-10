@@ -111,7 +111,7 @@ class AppSchema extends CakeSchema {
         ],
         'middlename' => [
             'type'    => 'string', 
-            'null'    => false, 
+            'null'    => true, 
             'default' => null, 
             'collate' => 'utf8_general_ci', 
             'charset' => 'utf8', 
@@ -172,7 +172,7 @@ class AppSchema extends CakeSchema {
             'unsigned' => false
         ],
         'contact' => [
-            'type'     => 'integer', 
+            'type'     => 'biginteger', 
             'null'     => false, 
             'default'  => null, 
             'unsigned' => false
