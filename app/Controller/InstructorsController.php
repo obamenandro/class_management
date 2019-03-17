@@ -128,7 +128,14 @@ class InstructorsController extends AppController {
         ];
         if ($this->request->is('post')) {
             $data = $this->request->data;
-            if ($this->Auth->login()) {
+            $instructor = $this->Instructor->find('first', [
+                'conditions' => [
+                    'Instructor.password' => AuthComponent::password($data['password']),
+                    'Instructor.username' => $data['username']
+                ]
+            ]);
+            if (!empty($instructor)) {
+                $this->Session->write('Auth', $instructor);
                 $response = [
                     'status' => 'success',
                     'message' => 'Successfully login.'

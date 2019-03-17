@@ -39,10 +39,10 @@ class AppController extends Controller {
             'loginError'     => 'Invalid Username or Password entered, please try again.',
             'authenticate'   => [
                 'Form' => [
-                    'passwordHasher' => 'Blowfish',
+                    // 'passwordHasher' => 'Blowfish',
                     'fields' => [
                         'username' => 'username',
-                        'password' => 'password'
+                        // 'password' => 'password'
                     ]
                 ]
             ]

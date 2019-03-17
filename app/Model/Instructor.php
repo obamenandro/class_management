@@ -11,9 +11,14 @@ class Instructor extends AppModel {
      */
     public function beforeSave($options = []) {
         if (isset($this->data['Instructor']['password'])) {
-            $passwordHasher = new BlowfishPasswordHasher();
-            $this->data['Instructor']['password'] = $passwordHasher->hash($this->data['Instructor']['password']);
+            $this->data['Instructor']['password'] = AuthComponent::password(
+                $this->data['Instructor']['password']
+            );
         }
+        // if (isset($this->data['Instructor']['password'])) {
+        //     $passwordHasher = new BlowfishPasswordHasher();
+        //     $this->data['Instructor']['password'] = $passwordHasher->hash($this->data['Instructor']['password']);
+        // }
         return true;
     }
 }
