@@ -119,4 +119,9 @@ class StudentsController extends AppController {
         $this->response->body(json_encode($response));
         return $this->response->send();
     }
+    private function __decode($data) {
+        $data = str_replace(['[',']'],'', $data);
+        $data = str_replace('=>',':', $data);
+        return json_decode($data);
+    }
 }
