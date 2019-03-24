@@ -45,8 +45,7 @@ class InstructorsController extends AppController {
             ];
         }
         $this->response->type('application/json');
-        $this->response->body(json_encode($response));
-        return $this->response->send();
+        return $this->response->body(json_encode($response));
     }
 
     /**
@@ -75,8 +74,7 @@ class InstructorsController extends AppController {
                 ];
             }
             $this->response->type('application/json');
-            $this->response->body(json_encode($response));
-            return $this->response->send();
+            return $this->response->body(json_encode($response));
         }
     }
     /**
@@ -138,7 +136,8 @@ class InstructorsController extends AppController {
                 $this->Session->write('Auth', $instructor);
                 $response = [
                     'status' => 'success',
-                    'message' => 'Successfully login.'
+                    'message' => 'Successfully login.',
+                    'data' => [$instructor]
                 ];
             } else {
                 $response = [
@@ -148,8 +147,7 @@ class InstructorsController extends AppController {
             }
         }
         $this->response->type('application/json');
-        $this->response->body(json_encode($response));
-        return $this->response->send();
+        return $this->response->body(json_encode($response));
     }
 
     public function logout() {
@@ -161,13 +159,30 @@ class InstructorsController extends AppController {
             ];
         }
         $this->response->type('application/json');
-        $this->response->body(json_encode($response));
-        return $this->response->send();
+        return $this->response->body(json_encode($response));
     }
 
-    private function __decode($data) {
-        $data = str_replace(['[',']'],'', $data);
-        $data = str_replace('=>',':', $data);
-        return json_decode($data);
+    public function attendance() {
+        $this->autRender = false;
+        $response = [
+            'status' => 'failed',
+            'message' => 'HTTP method not allowed.'
+        ];
+        if ($this->request->is('post')) {
+            $data = $this->request->data;
+            if ($this->Attendance->save($data)) {
+                $response = [
+                    'status' => 'success',
+                    'message' => 'Successfully save attendance.'
+                ];
+            } else {
+                $response = [
+                    'status' => 'failed',
+                    'message' => 'Attendance has been failed to saved.'
+                ];
+            }
+        }
+        $this->response->type('application/json');
+        return $this->response->body(json_encode($response));
     }
 }

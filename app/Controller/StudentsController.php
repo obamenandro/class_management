@@ -46,8 +46,7 @@ class StudentsController extends AppController {
             ];
         }
         $this->response->type('application/json');
-        $this->response->body(json_encode($response));
-        return $this->response->send();
+        return $this->response->body(json_encode($response));
     }
 
     /**
@@ -76,8 +75,7 @@ class StudentsController extends AppController {
                 ];
             }
             $this->response->type('application/json');
-            $this->response->body(json_encode($response));
-            return $this->response->send();
+            return $this->response->body(json_encode($response));
         }
     }
 
@@ -116,12 +114,45 @@ class StudentsController extends AppController {
             }
         }
         $this->response->type('application/json');
-        $this->response->body(json_encode($response));
-        return $this->response->send();
+        return $this->response->body(json_encode($response));
     }
-    private function __decode($data) {
-        $data = str_replace(['[',']'],'', $data);
-        $data = str_replace('=>',':', $data);
-        return json_decode($data);
+    /**
+     * Seach student
+     */
+    public function search() {
+        $response = [
+            'status' => 'failed',
+            'message' => 'HTTP method not allowed.'
+        ];
+        if ($this->request->query) {
+            $data = $this->request->query;
+            $conditions = [];
+            if (!empty($data['name']) && isset($data['name'])) {
+                $conditions['Student.name LIKE'] = '%' . $data['name'] . '%';
+            }
+            if (!empty($data['student_id']) && isset($data['student_id'])) {
+                $conditions['Student.student_id'] = $data['student_id'];
+            }
+            $conditions['Student.deleted_date'] = NULL;
+
+            $students = $this->Student->find('all', [
+                'conditions' => $conditions
+            ]);
+
+            if (!empty($students)) {
+                $response = [
+                    'status' => 'success',
+                    'message' => 'Record found.',
+                    'data' => [$students]
+                ];
+            } else {
+                $response = [
+                    'status' => 'failed',
+                    'message' => 'No record found.'
+                ];
+            }
+        }
+        $this->response->type('application/json');
+        return $this->response->body(json_encode($response));
     }
 }
