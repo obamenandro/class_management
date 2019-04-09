@@ -42,4 +42,23 @@
  * the built-in default routes.
  */
     require CAKE . 'Config' . DS . 'routes.php';
-    Router::parseExtensions();
+
+   //Instructors
+   Router::connect('/instructors', ['controller' => 'instructors', 'action' => 'add']);
+   Router::connect('/instructors/*', ['controller' => 'instructors', 'action' => 'edit']);
+   Router::connect('/instructors/login', ['controller' => 'instructors', 'action' => 'login']);
+   //Courses
+   Router::connect('/courses/add', ['controller' => 'courses', 'action' => 'add']);
+   Router::connect('/courses/list/*', ['controller' => 'courses', 'action' => 'list']);
+   Router::connect('/courses/edit/*', ['controller' => 'courses', 'action' => 'edit']);
+   Router::connect('/courses/delete/*', ['controller' => 'courses', 'action' => 'delete']);
+   //Attendance
+   Router::connect('/attendances/list/*', ['controller' => 'attendances', 'action' => 'list']);
+   Router::connect('/attendances/add', ['controller' => 'attendances', 'action' => 'add']);
+   Router::connect('/attendances/edit/*', ['controller' => 'attendances', 'action' => 'edit']);
+   //Students
+   Router::connect('/students/edit/*', ['controller' => 'students', 'action' => 'edit']);
+   Router::connect('/students/add', ['controller' => 'students', 'action' => 'add']);
+   Router::connect('/students/search/*', ['controller' => 'students', 'action' => 'search']);
+   Router::connect('/students/delete/*', ['controller' => 'students', 'action' => 'delete']);
+   Router::parseExtensions();

@@ -13,97 +13,94 @@ class AttendancesController extends AppController {
  *
  * @var array
  */
-	public $components = array('Paginator');
+    public $components = array('Paginator');
 
-/**
- * index method
- *
- * @return void
- */
-	public function index() {
-		$this->Attendance->recursive = 0;
-		$this->set('attendances', $this->Paginator->paginate());
-	}
+    public function list() {
+        $response = [
+            'status' => 'failed',
+            'message' => 'HTTP method not allowed.'
+        ];
+        if (!empty($this->request->query)) {
+            $conditions = [];
+            if (!empty($this->request->query['date_taken'])) {
+                $conditions['Attendance.date_taken'] = $this->request->query['date_taken'];
+            }
 
-/**
- * view method
- *
- * @throws NotFoundException
- * @param string $id
- * @return void
- */
-	public function view($id = null) {
-		if (!$this->Attendance->exists($id)) {
-			throw new NotFoundException(__('Invalid attendance'));
-		}
-		$options = array('conditions' => array('Attendance.' . $this->Attendance->primaryKey => $id));
-		$this->set('attendance', $this->Attendance->find('first', $options));
-	}
+            if (!empty($this->request->query['course_id'])) {
+                $conditions['Attendance.course_id'] = $this->request->query['course_id'];
+            }
+            $conditions['Attendance.deleted'] = 0;
 
-/**
- * add method
- *
- * @return void
- */
-	public function add() {
-		if ($this->request->is('post')) {
-			$this->Attendance->create();
-			if ($this->Attendance->save($this->request->data)) {
-				$this->Flash->success(__('The attendance has been saved.'));
-				return $this->redirect(array('action' => 'index'));
-			} else {
-				$this->Flash->error(__('The attendance could not be saved. Please, try again.'));
-			}
-		}
-		$students = $this->Attendance->Student->find('list');
-		$instructors = $this->Attendance->Instructor->find('list');
-		$this->set(compact('students', 'instructors'));
-	}
+            $attendance = $this->Attendance->find('all', [
+                'conditions' => $conditions
+            ]);
 
-/**
- * edit method
- *
- * @throws NotFoundException
- * @param string $id
- * @return void
- */
-	public function edit($id = null) {
-		if (!$this->Attendance->exists($id)) {
-			throw new NotFoundException(__('Invalid attendance'));
-		}
-		if ($this->request->is(array('post', 'put'))) {
-			if ($this->Attendance->save($this->request->data)) {
-				$this->Flash->success(__('The attendance has been saved.'));
-				return $this->redirect(array('action' => 'index'));
-			} else {
-				$this->Flash->error(__('The attendance could not be saved. Please, try again.'));
-			}
-		} else {
-			$options = array('conditions' => array('Attendance.' . $this->Attendance->primaryKey => $id));
-			$this->request->data = $this->Attendance->find('first', $options);
-		}
-		$students = $this->Attendance->Student->find('list');
-		$instructors = $this->Attendance->Instructor->find('list');
-		$this->set(compact('students', 'instructors'));
-	}
-
-/**
- * delete method
- *
- * @throws NotFoundException
- * @param string $id
- * @return void
- */
-	public function delete($id = null) {
-		if (!$this->Attendance->exists($id)) {
-			throw new NotFoundException(__('Invalid attendance'));
-		}
-		$this->request->allowMethod('post', 'delete');
-		if ($this->Attendance->delete($id)) {
-			$this->Flash->success(__('The attendance has been deleted.'));
-		} else {
-			$this->Flash->error(__('The attendance could not be deleted. Please, try again.'));
-		}
-		return $this->redirect(array('action' => 'index'));
-	}
+            if (!empty($attendance)) {
+                $response = [
+                    'status' => 'success',
+                    'data' => $attendance
+                ];
+            } else {
+                $response = [
+                    'status' => 'failed',
+                    'data' => 'No record found.'
+                ];
+            }
+        }
+        $this->response->type('application/json');
+        return $this->response->body(json_encode($response));
+    }
+    /**
+     * Edit attendance
+     */
+    public function edit($id) {
+        $response = [
+            'status' => 'failed',
+            'message' => 'HTTP method not allowed.'
+        ];
+        if ($this->request->is(['put', 'post'])) {
+            try {
+                $data = $this->request->data;
+                $this->Attendance->id = $id;
+                if ($this->Attendance->save($data)) {
+                    $response = [
+                        'status' => 'success',
+                        'message' => 'Attendance has been successfully updated.'
+                    ];
+                }
+            } catch (Exception $e) {
+                $response = [
+                    'status' => 'failed',
+                    'message' => 'Attendance has been failed to update.'
+                ];
+            }
+            $this->response->type('application/json');
+            return $this->response->body(json_encode($response));
+        }
+    }
+    /**
+     * Add Attendance
+     */
+    public function add() {
+        $response = [
+            'status' => 'failed',
+            'message' => 'HTTP method not allowed.'
+        ];
+        if ($this->request->is('post')) {
+            $data = $this->request->data;
+            if ($this->Attendance->save($data)) {
+                $response = [
+                    'status' => 'success',
+                    'message' => 'Successfully save attendance.'
+                ];
+            } else {
+                $response = [
+                    'status' => 'failed',
+                    'message' => 'Attendance has been failed to saved.'
+                ];
+            }
+        }
+        $this->response->type('application/json');
+        return $this->response->body(json_encode($response));
+    }
 }
