@@ -55,7 +55,7 @@
    //Attendance
    Router::connect('/attendances/list/*', ['controller' => 'attendances', 'action' => 'list']);
    Router::connect('/attendances/add', ['controller' => 'attendances', 'action' => 'add']);
-   Router::connect('/attendances/edit/*', ['controller' => 'attendances', 'action' => 'edit']);
+   Router::connect('/attendances/edit', ['controller' => 'attendances', 'action' => 'edit']);
    //Students
    Router::connect('/students/edit/*', ['controller' => 'students', 'action' => 'edit']);
    Router::connect('/students/add', ['controller' => 'students', 'action' => 'add']);
@@ -72,7 +72,7 @@
    Router::connect('/activities/list/*', ['controller' => 'activities', 'action' => 'list']);
    Router::connect('/activities/delete/*', ['controller' => 'activities', 'action' => 'delete']);
    //ActivitieResults
-   Router::connect('/activity_results/edit/*', ['controller' => 'ActivityResults', 'action' => 'edit']);
+   Router::connect('/activity_results/edit', ['controller' => 'ActivityResults', 'action' => 'edit']);
    Router::connect('/activity_results/add', ['controller' => 'ActivityResults', 'action' => 'add']);
    Router::connect('/activity_results/list/*', ['controller' => 'ActivityResults', 'action' => 'list']);
    Router::parseExtensions();

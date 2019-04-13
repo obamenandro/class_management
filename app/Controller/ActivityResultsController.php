@@ -57,7 +57,15 @@ class ActivityResultsController extends AppController {
         ];
         if ($this->request->is('post')) {
             $data = $this->request->data;
-            if ($this->ActivityResult->save($data)) {
+            $results = [];
+            foreach ($data as $value) {
+                $results[]['ActivityResult'] = [
+                    'student_id'  => $value['student_id'],
+                    'activity_id' => $value['activity_id'],
+                    'score'       => $value['score'],
+                ];
+            }
+            if ($this->ActivityResult->saveMany($results)) {
                 $response = [
                     'status' => 'success',
                     'message' => 'Successfully save results.'
@@ -66,6 +74,40 @@ class ActivityResultsController extends AppController {
                 $response = [
                     'status' => 'failed',
                     'message' => 'Results has been failed to saved.'
+                ];
+            }
+        }
+        $this->response->type('application/json');
+        return $this->response->body(json_encode($response));
+    }
+    /**
+     * Edit ActivityResults
+     */
+    public function Edit() {
+        $response = [
+            'status' => 'failed',
+            'message' => 'HTTP method not allowed.'
+        ];
+        if ($this->request->is('post')) {
+            $data = $this->request->data;
+            $results = [];
+            foreach ($data as $value) {
+                $results[]['ActivityResult'] = [
+                    'id'          => $value['id'],
+                    'student_id'  => $value['student_id'],
+                    'activity_id' => $value['activity_id'],
+                    'score'       => $value['score'],
+                ];
+            }
+            if ($this->ActivityResult->saveMany($results)) {
+                $response = [
+                    'status' => 'success',
+                    'message' => 'Successfully updated results.'
+                ];
+            } else {
+                $response = [
+                    'status' => 'failed',
+                    'message' => 'Results has been failed to update.'
                 ];
             }
         }

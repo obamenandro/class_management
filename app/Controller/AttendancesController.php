@@ -61,8 +61,16 @@ class AttendancesController extends AppController {
         if ($this->request->is(['put', 'post'])) {
             try {
                 $data = $this->request->data;
-                $this->Attendance->id = $id;
-                if ($this->Attendance->save($data)) {
+                $attendances = [];
+                foreach($data as $value) {
+                    $attendances[]['Attendance'] = [
+                        'id'         => $value['id'],
+                        'student_id' => $value['student_id'],
+                        'course_id'  => $value['course_id'],
+                        'date_taken' => $value['date_taken'],
+                    ];
+                } 
+                if ($this->Attendance->saveMany($attendances)) {
                     $response = [
                         'status' => 'success',
                         'message' => 'Attendance has been successfully updated.'
@@ -88,7 +96,15 @@ class AttendancesController extends AppController {
         ];
         if ($this->request->is('post')) {
             $data = $this->request->data;
-            if ($this->Attendance->save($data)) {
+            $attendances = [];
+            foreach($data as $value) {
+                $attendances[]['Attendance'] = [
+                    'student_id' => $value['student_id'],
+                    'course_id'  => $value['course_id'],
+                    'date_taken' => $value['date_taken'],
+                ];
+            } 
+            if ($this->Attendance->saveMany($attendances)) {
                 $response = [
                     'status' => 'success',
                     'message' => 'Successfully save attendance.'
