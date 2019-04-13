@@ -61,4 +61,18 @@
    Router::connect('/students/add', ['controller' => 'students', 'action' => 'add']);
    Router::connect('/students/search/*', ['controller' => 'students', 'action' => 'search']);
    Router::connect('/students/delete/*', ['controller' => 'students', 'action' => 'delete']);
+   // Criteria
+   Router::connect('/criteria/edit/*', ['controller' => 'criteria', 'action' => 'edit']);
+   Router::connect('/criteria/add', ['controller' => 'criteria', 'action' => 'add']);
+   Router::connect('/criteria/list/*', ['controller' => 'criteria', 'action' => 'list']);
+   Router::connect('/criteria/delete/*', ['controller' => 'criteria', 'action' => 'delete']);
+   //Activities
+   Router::connect('/activities/edit/*', ['controller' => 'activities', 'action' => 'edit']);
+   Router::connect('/activities/add', ['controller' => 'activities', 'action' => 'add']);
+   Router::connect('/activities/list/*', ['controller' => 'activities', 'action' => 'list']);
+   Router::connect('/activities/delete/*', ['controller' => 'activities', 'action' => 'delete']);
+   //ActivitieResults
+   Router::connect('/activity_results/edit/*', ['controller' => 'ActivityResults', 'action' => 'edit']);
+   Router::connect('/activity_results/add', ['controller' => 'ActivityResults', 'action' => 'add']);
+   Router::connect('/activity_results/list/*', ['controller' => 'ActivityResults', 'action' => 'list']);
    Router::parseExtensions();
