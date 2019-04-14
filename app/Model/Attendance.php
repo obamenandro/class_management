@@ -71,12 +71,12 @@ class Attendance extends AppModel {
 			'fields' => '',
 			'order' => ''
 		),
-		'Instructor' => array(
-			'className' => 'Instructor',
-			'foreignKey' => 'instructor_id',
-			'conditions' => '',
-			'fields' => '',
-			'order' => ''
-		)
+		// 'Instructor' => array(
+		// 	'className' => 'Instructor',
+		// 	'foreignKey' => 'instructor_id',
+		// 	'conditions' => '',
+		// 	'fields' => '',
+		// 	'order' => ''
+		// )
 	);
 }

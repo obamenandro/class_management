@@ -49,11 +49,11 @@
    Router::connect('/instructors/login', ['controller' => 'instructors', 'action' => 'login']);
    //Courses
    Router::connect('/courses/add', ['controller' => 'courses', 'action' => 'add']);
-   Router::connect('/courses/list/*', ['controller' => 'courses', 'action' => 'list']);
+   Router::connect('/courses/show_list/*', ['controller' => 'courses', 'action' => 'show_list']);
    Router::connect('/courses/edit/*', ['controller' => 'courses', 'action' => 'edit']);
    Router::connect('/courses/delete/*', ['controller' => 'courses', 'action' => 'delete']);
    //Attendance
-   Router::connect('/attendances/list/*', ['controller' => 'attendances', 'action' => 'list']);
+   Router::connect('/attendances/show_list/*', ['controller' => 'attendances', 'action' => 'show_list']);
    Router::connect('/attendances/add', ['controller' => 'attendances', 'action' => 'add']);
    Router::connect('/attendances/edit', ['controller' => 'attendances', 'action' => 'edit']);
    //Students
@@ -64,15 +64,15 @@
    // Criteria
    Router::connect('/criteria/edit/*', ['controller' => 'criteria', 'action' => 'edit']);
    Router::connect('/criteria/add', ['controller' => 'criteria', 'action' => 'add']);
-   Router::connect('/criteria/list/*', ['controller' => 'criteria', 'action' => 'list']);
+   Router::connect('/criteria/show_list/*', ['controller' => 'criteria', 'action' => 'show_list']);
    Router::connect('/criteria/delete/*', ['controller' => 'criteria', 'action' => 'delete']);
    //Activities
    Router::connect('/activities/edit/*', ['controller' => 'activities', 'action' => 'edit']);
    Router::connect('/activities/add', ['controller' => 'activities', 'action' => 'add']);
-   Router::connect('/activities/list/*', ['controller' => 'activities', 'action' => 'list']);
+   Router::connect('/activities/show_list/*', ['controller' => 'activities', 'action' => 'show_list']);
    Router::connect('/activities/delete/*', ['controller' => 'activities', 'action' => 'delete']);
    //ActivitieResults
    Router::connect('/activity_results/edit', ['controller' => 'ActivityResults', 'action' => 'edit']);
    Router::connect('/activity_results/add', ['controller' => 'ActivityResults', 'action' => 'add']);
-   Router::connect('/activity_results/list/*', ['controller' => 'ActivityResults', 'action' => 'list']);
+   Router::connect('/activity_results/show_list/*', ['controller' => 'ActivityResults', 'action' => 'show_list']);
    Router::parseExtensions();

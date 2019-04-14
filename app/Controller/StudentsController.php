@@ -20,6 +20,39 @@ class StudentsController extends AppController {
         $this->Auth->allow('login','logout','add','edit', 'delete');
     }
 
+    /** 
+     * Get students which belong to course using course id
+    */
+    public function show_list($id) {
+        $this->autRender = false;
+        $response = [
+            'status' => 'failed',
+            'message' => 'HTTP method not allowed.'
+        ];
+        if ($id) {
+            $student = $this->Student->find('all', [
+                'conditions' => [
+                    'Student.course_id' => $id,
+                    'Student.deleted' => 0
+                ]
+            ]);
+
+            if (!empty($student)) {
+                $response = [
+                    'status' => 'success',
+                    'data' => $student
+                ];
+            } else {
+                $response = [
+                    'status' => 'failed',
+                    'message' => 'No student available.'
+                ];
+            }
+        }
+        $this->response->type('application/json');
+        return $this->response->body(json_encode($response));
+    }
+
     /**
      * Add Student
      */
@@ -90,7 +123,7 @@ class StudentsController extends AppController {
                 'Student.deleted' => 0
             ]
         ]);
-        if (!empty($student)) {
+        if (empty($student)) {
             $response = [
                 'status' => 'failed',
                 'message' => 'Student is not exists.'

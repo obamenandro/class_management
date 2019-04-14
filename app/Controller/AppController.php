@@ -66,7 +66,7 @@ class AppController extends Controller {
     // }
 
     public function beforeFilter() {
-        $this->Auth->allow('add', 'login');
+        $this->Auth->allow();
         $this->autoRender = false;
         //datasource for transaction
         // $this->dataSource = ConnectionManager::getDataSource('default');

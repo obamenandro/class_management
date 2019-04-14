@@ -18,7 +18,7 @@ class CoursesController extends AppController {
     /** 
      * Get courses which belong to instructor using instructor id
     */
-    public function list($id) {
+    public function show_list($id) {
         $this->autRender = false;
         $response = [
             'status' => 'failed',

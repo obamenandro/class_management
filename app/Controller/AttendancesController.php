@@ -15,7 +15,7 @@ class AttendancesController extends AppController {
  */
     public $components = array('Paginator');
 
-    public function list() {
+    public function show_list() {
         $response = [
             'status' => 'failed',
             'message' => 'HTTP method not allowed.'
@@ -32,10 +32,16 @@ class AttendancesController extends AppController {
             $conditions['Attendance.deleted'] = 0;
 
             $attendance = $this->Attendance->find('all', [
-                'conditions' => $conditions
+                'conditions' => $conditions,
+                'fields' => ['Attendance.*', 'Student.name as student_name']
             ]);
 
             if (!empty($attendance)) {
+
+                foreach ($attendance as $key => $value) {
+                    $attendance[$key]['Attendance']['student_name'] = $value['Student']['student_name'];
+                }
+
                 $response = [
                     'status' => 'success',
                     'data' => $attendance
@@ -53,7 +59,7 @@ class AttendancesController extends AppController {
     /**
      * Edit attendance
      */
-    public function edit($id) {
+    public function edit() {
         $response = [
             'status' => 'failed',
             'message' => 'HTTP method not allowed.'
@@ -62,12 +68,13 @@ class AttendancesController extends AppController {
             try {
                 $data = $this->request->data;
                 $attendances = [];
-                foreach($data as $value) {
+                foreach($data['attendance'] as $value) {
                     $attendances[]['Attendance'] = [
                         'id'         => $value['id'],
                         'student_id' => $value['student_id'],
                         'course_id'  => $value['course_id'],
                         'date_taken' => $value['date_taken'],
+                        'is_present' => $value['is_present']
                     ];
                 } 
                 if ($this->Attendance->saveMany($attendances)) {
@@ -97,11 +104,12 @@ class AttendancesController extends AppController {
         if ($this->request->is('post')) {
             $data = $this->request->data;
             $attendances = [];
-            foreach($data as $value) {
+            foreach($data['attendance'] as $value) {
                 $attendances[]['Attendance'] = [
                     'student_id' => $value['student_id'],
                     'course_id'  => $value['course_id'],
                     'date_taken' => $value['date_taken'],
+                    'is_present' => $value['is_present']
                 ];
             } 
             if ($this->Attendance->saveMany($attendances)) {
