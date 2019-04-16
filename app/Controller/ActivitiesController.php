@@ -15,7 +15,7 @@ class ActivitiesController extends AppController {
  */
     public $components = array('Paginator');
 
-    public function list() {
+    public function show_list() {
         $response = [
             'status' => 'failed',
             'message' => 'HTTP method not allowed.'
@@ -29,7 +29,8 @@ class ActivitiesController extends AppController {
             $conditions['Activity.deleted'] = 0;
 
             $activities = $this->Activity->find('all', [
-                'conditions' => $conditions
+                'conditions' => $conditions,
+                'fields' => ['Activity.*', 'Criterion.name']
             ]);
 
             if (!empty($activities)) {

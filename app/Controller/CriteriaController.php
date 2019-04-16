@@ -15,7 +15,7 @@ class CriteriaController extends AppController {
  */
     public $components = array('Paginator');
 
-    public function list() {
+    public function show_list() {
         $response = [
             'status' => 'failed',
             'message' => 'HTTP method not allowed.'
@@ -23,12 +23,12 @@ class CriteriaController extends AppController {
         if (!empty($this->request->query)) {
             $conditions = [];
             if (!empty($this->request->query['course_id'])) {
-                $conditions['Criteria.course_id'] = $this->request->query['course_id'];
+                $conditions['Criterion.course_id'] = $this->request->query['course_id'];
             }
 
-            $conditions['Criteria.deleted'] = 0;
+            $conditions['Criterion.deleted'] = 0;
 
-            $criteria = $this->Criteria->find('all', [
+            $criteria = $this->Criterion->find('all', [
                 'conditions' => $conditions
             ]);
 
@@ -49,7 +49,7 @@ class CriteriaController extends AppController {
     }
 
     /**
-     * Add Criteria
+     * Add Criterion
      */
     public function add() {
         $response = [
@@ -58,7 +58,7 @@ class CriteriaController extends AppController {
         ];
         if ($this->request->is('post')) {
             $data = $this->request->data;
-            if ($this->Criteria->save($data)) {
+            if ($this->Criterion->save($data)) {
                 $response = [
                     'status' => 'success',
                     'message' => 'Successfully save criteria.'
@@ -66,7 +66,7 @@ class CriteriaController extends AppController {
             } else {
                 $response = [
                     'status' => 'failed',
-                    'message' => 'Criteria has been failed to saved.'
+                    'message' => 'Criterion has been failed to saved.'
                 ];
             }
         }
@@ -84,17 +84,17 @@ class CriteriaController extends AppController {
         if ($this->request->is(['put', 'post'])) {
             try {
                 $data = $this->request->data;
-                $this->Criteria->id = $id;
-                if ($this->Criteria->save($data)) {
+                $this->Criterion->id = $id;
+                if ($this->Criterion->save($data)) {
                     $response = [
                         'status' => 'success',
-                        'message' => 'Criteria has been successfully updated.'
+                        'message' => 'Criterion has been successfully updated.'
                     ];
                 }
             } catch (Exception $e) {
                 $response = [
                     'status' => 'failed',
-                    'message' => 'Criteria has been failed to update.'
+                    'message' => 'Criterion has been failed to update.'
                 ];
             }
             $this->response->type('application/json');
@@ -102,35 +102,35 @@ class CriteriaController extends AppController {
         }
     }
     /**
-     * Delete Criteria
+     * Delete Criterion
      */
     public function delete($id) {
         $response = [
             'status' => 'failed',
             'message' => 'HTTP method not allowed.'
         ];
-        $check = $this->Criteria->find('first' , [
+        $check = $this->Criterion->find('first' , [
             'conditions' => [
-                'Criteria.id' => $id,
-                'Criteria.deleted' => 0
+                'Criterion.id' => $id,
+                'Criterion.deleted' => 0
             ]
         ]);
 
         if (!empty($check)) {
-            $criteria['Criteria'] = [
+            $criteria['Criterion'] = [
                 'id' => $id,
                 'deleted' => 1,
                 'deleted_date' => date('Y-m-d')
             ];
-            if ($this->Criteria->save($criteria)) {
+            if ($this->Criterion->save($criteria)) {
                 $response = [
                     'status' => 'success',
-                    'message' => 'Criteria successfully deleted.'
+                    'message' => 'Criterion successfully deleted.'
                 ];
             } else {
                 $response = [
                     'status' => 'failed', 
-                    'message' => 'Criteria has been failed to delete.'
+                    'message' => 'Criterion has been failed to delete.'
                 ];
             }
         }

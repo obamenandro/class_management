@@ -258,10 +258,11 @@ class AppSchema extends CakeSchema {
             'charset' => 'utf8', 
         ],
         'code' => [
-            'type'     => 'integer', 
+            'type'     => 'string', 
             'null'     => false, 
             'default'  => null, 
-            'unsigned' => false
+            'collate' => 'utf8_general_ci', 
+            'charset' => 'utf8', 
         ],
         'schedule' => [
             'type'    => 'string', 
@@ -323,6 +324,12 @@ class AppSchema extends CakeSchema {
             'type'    => 'string', 
             'null'    => true, 
             'default' => null
+        ],
+        'is_present' => [
+            'type'     => 'integer', 
+            'null'     => false, 
+            'default'  => 0, 
+            'unsigned' => false
         ],
         'deleted' => [
             'type'     => 'integer', 
@@ -411,6 +418,12 @@ class AppSchema extends CakeSchema {
             'collate' => 'utf8_general_ci', 
             'charset' => 'utf8', 
         ],
+        'course_id' => [
+            'type'     => 'integer', 
+            'null'     => false, 
+            'default'  => null, 
+            'unsigned' => false
+        ],
         'criteria_id' => [
             'type'     => 'integer', 
             'null'     => false, 
@@ -467,6 +480,12 @@ class AppSchema extends CakeSchema {
             'default' => null, 
             'collate' => 'utf8_general_ci', 
             'charset' => 'utf8', 
+        ],
+        'course_id' => [
+            'type'     => 'integer', 
+            'null'     => false, 
+            'default'  => null, 
+            'unsigned' => false, 
         ],
         'deleted' => [
             'type'     => 'integer', 
