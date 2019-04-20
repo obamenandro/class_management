@@ -90,6 +90,14 @@ class AppSchema extends CakeSchema {
             'charset' => 'utf8', 
             'comment' =>'Lastname'
         ],
+        'position' => [
+            'type'    => 'string', 
+            'null'    => false, 
+            'default' => null, 
+            'collate' => 'utf8_general_ci', 
+            'charset' => 'utf8', 
+            'comment' =>'Position'
+        ],
         'password' => [
             'type'    => 'string', 
             'null'    => false, 
@@ -108,10 +116,11 @@ class AppSchema extends CakeSchema {
             'unsigned' => false
         ],
         'contact_no' => [
-            'type'     => 'biginteger', 
-            'null'     => false, 
-            'default'  => null, 
-            'unsigned' => false
+            'type'    => 'string', 
+            'null'    => false, 
+            'default' => null, 
+            'collate' => 'utf8_general_ci', 
+            'charset' => 'utf8',
         ],
         'deleted' => [
             'type'     => 'integer', 

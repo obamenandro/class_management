@@ -69,13 +69,18 @@ class AttendancesController extends AppController {
                 $data = $this->request->data;
                 $attendances = [];
                 foreach($data['attendance'] as $value) {
-                    $attendances[]['Attendance'] = [
-                        'id'         => $value['id'],
+                    $dataToSave = [
                         'student_id' => $value['student_id'],
                         'course_id'  => $value['course_id'],
                         'date_taken' => $value['date_taken'],
                         'is_present' => $value['is_present']
                     ];
+
+                    if (isset($value['id']) && $value['id'] !== 'undefined') {
+                        $dataToSave['id'] = $value['id'];
+                    }
+
+                    $attendances[]['Attendance'] = $dataToSave;
                 } 
                 if ($this->Attendance->saveMany($attendances)) {
                     $response = [
@@ -86,7 +91,7 @@ class AttendancesController extends AppController {
             } catch (Exception $e) {
                 $response = [
                     'status' => 'failed',
-                    'message' => 'Attendance has been failed to update.'
+                    'message' => $e->getMessage()
                 ];
             }
             $this->response->type('application/json');

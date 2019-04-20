@@ -35,7 +35,7 @@ class InstructorsController extends AppController {
             } catch (Exception $e) { 
                 $response = [
                     'status' => 'failed',
-                    'message' => 'Instructor has been failed to saved.'
+                    'message' => $e->getMessage()
                 ];
             }
         } else {
@@ -60,6 +60,11 @@ class InstructorsController extends AppController {
         if ($this->request->is(['put', 'post'])) {
             try {
                 $data = $this->request->data;
+
+                if ($data['password'] == 'null') {
+                    unset($data['password']);
+                }
+
                 $this->Instructor->id = $id;
                 if ($this->Instructor->save($data)) {
                     $response = [

@@ -21,4 +21,14 @@ class Criterion extends AppModel {
 		)
 	);
 
+	public $hasMany = [
+		'Activity' => array(
+			'className' => 'Activity',
+			'foreignKey' => 'criteria_id',
+			'conditions' => '',
+			'fields' => '',
+			'order' => ''
+		),
+	];
+
 }

@@ -15,6 +15,8 @@ class StudentsController extends AppController {
  */
     public $components = array('Paginator');
 
+    public $uses = ['Course', 'Student'];
+
     public function beforeFilter() {
         parent::beforeFilter();
         $this->Auth->allow('login','logout','add','edit', 'delete');
@@ -24,7 +26,7 @@ class StudentsController extends AppController {
      * Get students which belong to course using course id
     */
     public function show_list($id) {
-        $this->autRender = false;
+        $this->autoRender = false;
         $response = [
             'status' => 'failed',
             'message' => 'HTTP method not allowed.'
@@ -34,6 +36,9 @@ class StudentsController extends AppController {
                 'conditions' => [
                     'Student.course_id' => $id,
                     'Student.deleted' => 0
+                ],
+                'order' => [
+                    ['Student.name' => 'ASC']
                 ]
             ]);
 
@@ -160,28 +165,146 @@ class StudentsController extends AppController {
         if ($this->request->query) {
             $data = $this->request->query;
             $conditions = [];
-            if (!empty($data['name']) && isset($data['name'])) {
-                $conditions['Student.name LIKE'] = '%' . $data['name'] . '%';
-            }
-            if (!empty($data['student_id']) && isset($data['student_id'])) {
-                $conditions['Student.student_id'] = $data['student_id'];
-            }
-            $conditions['Student.deleted_date'] = NULL;
+            if (!empty($data['instructor_id']) && isset($data['instructor_id'])) {
+                $courses = $this->Course->find('list', [
+                    'conditions' => [
+                        'Course.instructor_id' => $data['instructor_id'],
+                        'Course.deleted' => 0
+                    ],
+                    'fields' => ['Course.id']
+                ]);
 
-            $students = $this->Student->find('all', [
-                'conditions' => $conditions
+                $conditions['Student.course_id'] = $courses;
+            
+                if (!empty($data['name']) && isset($data['name'])) {
+                    $conditions['Student.name LIKE'] = '%' . $data['name'] . '%';
+                }
+                if (!empty($data['student_id']) && isset($data['student_id'])) {
+                    $conditions['Student.student_id'] = $data['student_id'];
+                }
+                $conditions['Student.deleted_date'] = NULL;
+
+                $students = $this->Student->find('all', [
+                    'conditions' => $conditions,
+                    'fields' => [
+                        'Student.*',
+                        'Course.code'
+                    ],
+                    'order' => [
+                        ['Student.name' => 'ASC']
+                    ]
+                ]);
+
+                if (!empty($students)) {
+                    $response = [
+                        'status' => 'success',
+                        'message' => 'Record found.',
+                        'data' => $students
+                    ];
+                } else {
+                    $response = [
+                        'status' => 'failed',
+                        'message' => 'No record found.'
+                    ];
+                }
+            }
+        }
+        $this->response->type('application/json');
+        return $this->response->body(json_encode($response));
+    }
+
+    /** 
+     * Get students which belong to course using course id
+    */
+    public function final_grade($id) {
+        $this->autoRender = false;
+        $response = [
+            'status' => 'failed',
+            'message' => 'HTTP method not allowed.'
+        ];
+        if ($id) {
+            $student = $this->Student->find('first', [
+                'conditions' => [
+                    'Student.id' => $id,
+                    'Student.deleted' => 0
+                ],
             ]);
 
-            if (!empty($students)) {
+            if (!empty($student)) {
+
+                $this->Course->Behaviors->load('Containable');
+                $data = $this->Course->find('first', [
+                    'conditions' => [
+                        'Course.id' => $student['Student']['course_id'],
+                        'Course.deleted' => 0
+                    ],
+                    'contain' => [
+                        'Criterion' => [
+                            'conditions' => [
+                                'Criterion.deleted = 0'
+                            ],
+                            'Activity' => [
+                                'conditions' => [
+                                    'Activity.deleted = 0'
+                                ],
+                                'ActivityResult' => [
+                                    'conditions' => [
+                                        'ActivityResult.student_id' => $student['Student']['id'],
+                                        'ActivityResult.deleted' => 0
+                                    ]
+                                ]
+                            ]
+                        ]
+                    ]
+                ]);
+
+                $gradePerCriterion = [];
+                foreach ($data['Criterion'] as $criterion) {
+                    $gradePerCriterion[$criterion['id']]['name'] = $criterion['name'];
+                    $gradePerCriterion[$criterion['id']]['grade'] = 0;
+                    $averageCriteriaGrade = 0;
+
+                    foreach ($criterion['Activity'] as $activity) {
+                        if (!empty($activity['ActivityResult'])) {
+                           $averageCriteriaGrade += $activity['ActivityResult'][0]['score'];
+                        }
+                    }
+
+                    if (!empty($criterion['Activity'])) {
+                        $averageCriteriaGrade /= count($criterion['Activity']);
+                    } else {
+                        $averageCriteriaGrade = 100;
+                    }
+
+                    $gradePerCriterion[$criterion['id']]['grade'] =
+                        $averageCriteriaGrade * ($criterion['percentage']/100);
+                }
+
+                $finalGrade = 0;
+
+                $responseData = [
+                    'Criterion' => [],
+                    'final_grade' => 0
+                ];
+
+                foreach ($gradePerCriterion as $grade) {
+                    $responseData['Criterion'][] = [
+                        'name' => $grade['name'],
+                        'grade' => $grade['grade']
+                    ];
+                    $finalGrade += $grade['grade'];
+                }
+
+                $responseData['final_grade'] = $finalGrade;
+
                 $response = [
                     'status' => 'success',
-                    'message' => 'Record found.',
-                    'data' => [$students]
+                    'data' => $responseData
                 ];
             } else {
                 $response = [
                     'status' => 'failed',
-                    'message' => 'No record found.'
+                    'message' => 'No student available.'
                 ];
             }
         }

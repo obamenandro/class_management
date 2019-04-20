@@ -11,6 +11,16 @@ class Course extends AppModel {
  *
  * @var string
  */
-	public $displayField = 'name';
+    public $displayField = 'name';
+
+    public $hasMany = [
+        'Criterion' => array(
+            'className' => 'Criterion',
+            'foreignKey' => 'course_id',
+            'conditions' => '',
+            'fields' => '',
+            'order' => ''
+        ),
+    ];
 
 }

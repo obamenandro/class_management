@@ -61,6 +61,7 @@
    Router::connect('/students/add', ['controller' => 'students', 'action' => 'add']);
    Router::connect('/students/search/*', ['controller' => 'students', 'action' => 'search']);
    Router::connect('/students/delete/*', ['controller' => 'students', 'action' => 'delete']);
+   Router::connect('/students/final_grade/*', ['controller' => 'students', 'action' => 'final_grade']);
    // Criteria
    Router::connect('/criteria/edit/*', ['controller' => 'criteria', 'action' => 'edit']);
    Router::connect('/criteria/add', ['controller' => 'criteria', 'action' => 'add']);

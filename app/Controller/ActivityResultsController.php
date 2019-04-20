@@ -15,7 +15,7 @@ class ActivityResultsController extends AppController {
  */
     public $components = array('Paginator');
 
-    public function list() {
+    public function show_list() {
         $response = [
             'status' => 'failed',
             'message' => 'HTTP method not allowed.'
@@ -29,7 +29,11 @@ class ActivityResultsController extends AppController {
             $conditions['ActivityResult.deleted'] = 0;
 
             $activity_results = $this->ActivityResult->find('all', [
-                'conditions' => $conditions
+                'conditions' => $conditions,
+                'fields' => [
+                    'ActivityResult.*',
+                    'Student.name'
+                ]
             ]);
 
             if (!empty($activity_results)) {
@@ -58,11 +62,11 @@ class ActivityResultsController extends AppController {
         if ($this->request->is('post')) {
             $data = $this->request->data;
             $results = [];
-            foreach ($data as $value) {
+            foreach ($data['activity_result'] as $value) {
                 $results[]['ActivityResult'] = [
                     'student_id'  => $value['student_id'],
                     'activity_id' => $value['activity_id'],
-                    'score'       => $value['score'],
+                    'score'       => $value['score'] != 'null' ? $value['score'] : 0,
                 ];
             }
             if ($this->ActivityResult->saveMany($results)) {
@@ -88,16 +92,21 @@ class ActivityResultsController extends AppController {
             'status' => 'failed',
             'message' => 'HTTP method not allowed.'
         ];
-        if ($this->request->is('post')) {
+        if ($this->request->is(['put', 'post'])) {
             $data = $this->request->data;
             $results = [];
-            foreach ($data as $value) {
-                $results[]['ActivityResult'] = [
-                    'id'          => $value['id'],
+            foreach ($data['activity_result'] as $value) {
+                $dataToSave = [
                     'student_id'  => $value['student_id'],
                     'activity_id' => $value['activity_id'],
-                    'score'       => $value['score'],
+                    'score'       => $value['score'] != 'null' ? $value['score'] : 0,
                 ];
+
+                if (isset($value['id']) && $value['id'] !== 'undefined') {
+                    $dataToSave['id'] = $value['id'];
+                }
+
+                $results[]['ActivityResult'] = $dataToSave;
             }
             if ($this->ActivityResult->saveMany($results)) {
                 $response = [

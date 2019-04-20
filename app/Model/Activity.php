@@ -28,4 +28,14 @@ class Activity extends AppModel {
 		)
 	);
 
+	public $hasMany = [
+		'ActivityResult' => array(
+			'className' => 'ActivityResult',
+			'foreignKey' => 'activity_id',
+			'conditions' => '',
+			'fields' => '',
+			'order' => ''
+		),
+	];
+
 }
