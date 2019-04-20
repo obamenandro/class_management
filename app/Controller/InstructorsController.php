@@ -31,11 +31,16 @@ class InstructorsController extends AppController {
                         'status' => 'success',
                         'message' => 'Instructor has been successfully saved.'
                     ];
-                } 
+                } else {
+                    $response = [
+                        'status' => 'failed',
+                        'errors' => $this->Instructor->validationErrors
+                    ];
+                }
             } catch (Exception $e) { 
                 $response = [
                     'status' => 'failed',
-                    'message' => $e->getMessage()
+                    'message' => 'Instructor has been failed to saved.',
                 ];
             }
         } else {
@@ -65,11 +70,22 @@ class InstructorsController extends AppController {
                     unset($data['password']);
                 }
 
+                $instructor = $this->Instructor->findById($id);
+                
+                if ($instructor['Instructor']['username'] == $data['username']) {
+                    unset($data['username']);
+                }
+
                 $this->Instructor->id = $id;
                 if ($this->Instructor->save($data)) {
                     $response = [
                         'status' => 'success',
                         'message' => 'Instructor has been successfully updated.'
+                    ];
+                } else {
+                    $response = [
+                        'status' => 'failed',
+                        'errors' => $this->Instructor->validationErrors
                     ];
                 }
             } catch (Exception $e) {
@@ -134,7 +150,8 @@ class InstructorsController extends AppController {
             $instructor = $this->Instructor->find('first', [
                 'conditions' => [
                     'Instructor.password' => AuthComponent::password($data['password']),
-                    'Instructor.username' => $data['username']
+                    'Instructor.username' => $data['username'],
+                    'Instructor.deleted' => 0
                 ]
             ]);
             if (!empty($instructor)) {
@@ -151,6 +168,7 @@ class InstructorsController extends AppController {
                 ];
             }
         }
+        $this->response->header('Access-Control-Allow-Origin', '*');
         $this->response->type('application/json');
         return $this->response->body(json_encode($response));
     }

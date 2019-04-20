@@ -68,6 +68,7 @@ class AppController extends Controller {
     public function beforeFilter() {
         $this->Auth->allow();
         $this->autoRender = false;
+        $this->response->header('Access-Control-Allow-Origin', '*');
         //datasource for transaction
         // $this->dataSource = ConnectionManager::getDataSource('default');
     }

@@ -15,7 +15,7 @@ class StudentsController extends AppController {
  */
     public $components = array('Paginator');
 
-    public $uses = ['Course', 'Student'];
+    public $uses = ['Attendance', 'Course', 'Student'];
 
     public function beforeFilter() {
         parent::beforeFilter();
@@ -284,7 +284,9 @@ class StudentsController extends AppController {
 
                 $responseData = [
                     'Criterion' => [],
-                    'final_grade' => 0
+                    'final_grade' => 0,
+                    'present_count' => 0,
+                    'absent_count' => 0
                 ];
 
                 foreach ($gradePerCriterion as $grade) {
@@ -296,6 +298,27 @@ class StudentsController extends AppController {
                 }
 
                 $responseData['final_grade'] = $finalGrade;
+
+                // Count attendance
+
+                $totalAttendanceDays = $this->Attendance->find('count', [
+                    'conditions' => [
+                        'Attendance.course_id' => $student['Student']['course_id'],
+                        'Attendance.deleted' => 0
+                    ],
+                    'fields' => 'DISTINCT Attendance.date_taken'
+                ]);
+
+                $studentAttendanceDays = $this->Attendance->find('count', [
+                    'conditions' => [
+                        'Attendance.student_id' => $student['Student']['id'],
+                        'Attendance.is_present' => 1,
+                        'Attendance.deleted' => 0
+                    ]
+                ]);
+
+                $responseData['present_count'] = $studentAttendanceDays;
+                $responseData['absent_count'] = $totalAttendanceDays - $studentAttendanceDays;
 
                 $response = [
                     'status' => 'success',

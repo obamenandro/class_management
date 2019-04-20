@@ -92,7 +92,7 @@ class AppSchema extends CakeSchema {
         ],
         'position' => [
             'type'    => 'string', 
-            'null'    => false, 
+            'null'    => true, 
             'default' => null, 
             'collate' => 'utf8_general_ci', 
             'charset' => 'utf8', 
@@ -117,7 +117,7 @@ class AppSchema extends CakeSchema {
         ],
         'contact_no' => [
             'type'    => 'string', 
-            'null'    => false, 
+            'null'    => true, 
             'default' => null, 
             'collate' => 'utf8_general_ci', 
             'charset' => 'utf8',
