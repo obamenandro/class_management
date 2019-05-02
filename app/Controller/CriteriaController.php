@@ -58,6 +58,7 @@ class CriteriaController extends AppController {
         ];
         if ($this->request->is('post')) {
             $data = $this->request->data;
+            $data['name'] = ucwords($data['name']);
             if ($this->Criterion->save($data)) {
                 $response = [
                     'status' => 'success',

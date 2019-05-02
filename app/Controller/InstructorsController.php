@@ -26,6 +26,9 @@ class InstructorsController extends AppController {
         if ($this->request->is('post')) {
             try {
                 $data = $this->request->data;
+                $data['first_name'] = ucwords($data['first_name']);
+                $data['last_name'] = ucwords($data['last_name']);
+                $data['position'] = ucwords($data['position']);
                 if ($this->Instructor->save($data)) {
                     $response = [
                         'status' => 'success',

@@ -65,6 +65,7 @@ class StudentsController extends AppController {
         if ($this->request->is('POST')) {
             try {
                 $data = $this->request->data;
+                $data['name'] = ucwords($data['name']);
                 if ($this->Student->save($data)) {
                     $response = [
                         'status' => 'success',

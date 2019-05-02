@@ -280,6 +280,19 @@ class AppSchema extends CakeSchema {
             'collate' => 'utf8_general_ci', 
             'charset' => 'utf8', 
         ],
+        'year' => [
+            'type'     => 'integer', 
+            'null'     => true, 
+            'default'  => null, 
+            'unsigned' => false
+        ],
+        'section' => [
+            'type'    => 'string', 
+            'null'    => true, 
+            'default' => null, 
+            'collate' => 'utf8_general_ci', 
+            'charset' => 'utf8', 
+        ],
         'deleted' => [
             'type'     => 'integer', 
             'null'     => false, 
