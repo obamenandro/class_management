@@ -15,6 +15,8 @@ class CoursesController extends AppController {
  */
     public $components = array('Paginator');
 
+    public $uses = ['Course', 'Criterion'];
+
     /** 
      * Get courses which belong to instructor using instructor id
     */
@@ -137,4 +139,147 @@ class CoursesController extends AppController {
         $this->response->type('application/json');
         return $this->response->body(json_encode($response));
     }
+
+    /** 
+     * Download course csv
+    */
+    public function download_csv($id) {
+        $this->autRender = false;
+        $response = [
+            'status' => 'failed',
+            'message' => 'HTTP method not allowed.'
+        ];
+        if ($id) {
+
+            $course = $this->Course->find('first', [
+                'conditions' => [
+                    'Course.id' => $id,
+                    'Course.deleted' => 0
+                ],
+            ]);
+
+            if (!empty($course)) {
+
+                $this->Course->Behaviors->load('Containable');
+                $data = $this->Course->find('first', [
+                    'conditions' => [
+                        'Course.id' => $id,
+                        'Course.deleted' => 0
+                    ],
+                    'contain' => [
+                        'Instructor',
+                        'Student' => [
+                            'conditions' => ['Student.deleted = 0'],
+                            'ActivityResult' => [
+                                'conditions' => ['ActivityResult.deleted = 0']
+                            ]
+                        ]
+                    ]
+                ]);
+
+                $this->Criterion->Behaviors->load('Containable');
+                $criteria = $this->Criterion->find('all', [
+                    'conditions' => [
+                        'Criterion.course_id' => $id,
+                        'Criterion.deleted' => 0
+                    ],
+                    'contain' => [
+                        'Activity' => [
+                            'fields' => ['Activity.id', 'Activity.name'],
+                            'conditions' => ['Activity.deleted = 0']
+                        ]
+                    ],
+                    'fields' => [
+                        'Criterion.name',
+                        'Criterion.percentage',
+                        'Criterion.id',
+                    ]
+                ]);
+
+                $csvContent = '';
+                $endLine = '"' . "\n";
+
+                $csvContent .= '"Course code:","' . $course['Course']['code'] . ' - ' . $course['Course']['name'] . $endLine;
+                $csvContent .= '"Schedule:","' . $course['Course']['schedule'] . $endLine;
+                $csvContent .= '"Instructor:","' . $course['Instructor']['first_name'] . ' ' . $course['Instructor']['last_name'] . $endLine;
+                $csvContent .= ',,';
+
+                foreach ($criteria as $criterion) {
+                    $csvContent .= ',"' . $criterion['Criterion']['name'] . '(' . $criterion['Criterion']['percentage'] . '%)' . '"';
+                    $cellSpaces = count($criterion['Activity']);
+                    if ($cellSpaces > 0) {
+                        $cellSpaces++;
+                    }
+                    for ($i = 0; $i < $cellSpaces; $i++) { 
+                        $csvContent .= ',';
+                    }
+                }
+
+                $csvContent .= "\n";
+
+                $csvContent .= ',"Student #","Student Name"';
+
+                foreach ($criteria as $criterion) {
+                    foreach ($criterion['Activity'] as $activity) {
+                        $csvContent .= ',"' . $activity['name'] . '"';
+                    }
+                    if (count($criterion['Activity']) == 0) {
+                        $csvContent .= ',';
+                    } else {
+                        $csvContent .= ',"AVERAGE","ACTUAL"';
+                    }
+                }
+
+                $csvContent .= ',"FINAL AVE","FINAL ACTUAL"' . "\n";
+
+                foreach ($data['Student'] as $student) {
+                    $csvContent .= ',"' . $student['number'] . '","' . $student['name'] . '"';
+                    $finalAverage = 0;
+                    $finalActual = 0;
+                    foreach ($criteria as $criterion) {
+                        $totalGrade = 0;
+                        foreach ($criterion['Activity'] as $activity) {
+                            $hasResult = 0;
+                            foreach ($student['ActivityResult'] as $activityResult) {
+                                if ($activityResult['activity_id'] == $activity['id']) {
+                                    $csvContent .= ',"' . $activityResult['score'] . '"';
+                                    $totalGrade += $activityResult['score'];
+                                    $hasResult = 1;
+                                    break;
+                                }
+                            }
+                            if ($hasResult == 0) {
+                                $csvContent .= ',"0"';
+                            }
+                        }
+                        if (count($criterion['Activity']) == 0) {
+                            $csvContent .= ',';
+                        } else {
+                            $average = $totalGrade / count($criterion['Activity']);
+                            $actual = $average * ($criterion['Criterion']['percentage'] / 100);
+                            $csvContent .= ',"' . $average . '","' . $actual . '"';
+                            $finalAverage += $average;
+                            $finalActual += $actual;
+                        }
+                    }
+                    $csvContent .= ',"' . $finalAverage . '","' . $finalActual . '"' . "\n";
+                }       
+                $fileName = $data['Course']['code'] . '-' . strtotime(date('Y-m-d H:i:s')) . '.csv';
+                $filePath = APP . 'webroot' . DS . 'files' . DS . $fileName;
+                file_put_contents($filePath, $csvContent);
+                $response = [
+                    'status' => 'success',
+                    'message' => $fileName
+                ];
+            } else {
+                $response = [
+                    'status' => 'failed',
+                    'message' => 'Course not found.'
+                ];
+            }
+        }
+        $this->response->type('application/json');
+        return $this->response->body(json_encode($response));
+    }
+
 }

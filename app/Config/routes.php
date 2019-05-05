@@ -52,6 +52,7 @@
    Router::connect('/courses/show_list/*', ['controller' => 'courses', 'action' => 'show_list']);
    Router::connect('/courses/edit/*', ['controller' => 'courses', 'action' => 'edit']);
    Router::connect('/courses/delete/*', ['controller' => 'courses', 'action' => 'delete']);
+   Router::connect('/courses/download_csv/*', ['controller' => 'courses', 'action' => 'download_csv']);
    //Attendance
    Router::connect('/attendances/show_list/*', ['controller' => 'attendances', 'action' => 'show_list']);
    Router::connect('/attendances/add', ['controller' => 'attendances', 'action' => 'add']);
@@ -62,6 +63,7 @@
    Router::connect('/students/search/*', ['controller' => 'students', 'action' => 'search']);
    Router::connect('/students/delete/*', ['controller' => 'students', 'action' => 'delete']);
    Router::connect('/students/final_grade/*', ['controller' => 'students', 'action' => 'final_grade']);
+   Router::connect('/students/upload_csv/*', ['controller' => 'students', 'action' => 'upload_csv']);
    // Criteria
    Router::connect('/criteria/edit/*', ['controller' => 'criteria', 'action' => 'edit']);
    Router::connect('/criteria/add', ['controller' => 'criteria', 'action' => 'add']);

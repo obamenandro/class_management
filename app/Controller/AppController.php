@@ -69,6 +69,8 @@ class AppController extends Controller {
         $this->Auth->allow();
         $this->autoRender = false;
         $this->response->header('Access-Control-Allow-Origin', '*');
+        $this->response->header('Access-Control-Allow-Methods', 'POST, PUT, GET, OPTIONS');
+        
         //datasource for transaction
         // $this->dataSource = ConnectionManager::getDataSource('default');
     }

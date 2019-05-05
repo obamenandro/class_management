@@ -16,6 +16,14 @@ class AppSchema extends CakeSchema {
             'unsigned' => false, 
             'key'      => 'primary'
         ],
+        'number' => [
+            'type'    => 'string', 
+            'null'    => false, 
+            'default' => null, 
+            'collate' => 'utf8_general_ci', 
+            'charset' => 'utf8', 
+            'comment' => 'unique student number'
+        ],
         'name' => [
             'type'    => 'string', 
             'null'    => false, 

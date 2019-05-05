@@ -66,16 +66,30 @@ class StudentsController extends AppController {
             try {
                 $data = $this->request->data;
                 $data['name'] = ucwords($data['name']);
-                if ($this->Student->save($data)) {
+                $student = $this->Student->find('first', [
+                    'conditions' => [
+                        'Student.number' => $data['number'],
+                        'Student.course_id' => $data['course_id'],
+                        'Student.deleted' => 0
+                    ]
+                ]);
+                if (!$student) {
+                    if ($this->Student->save($data)) {
+                        $response = [
+                            'status' => 'success',
+                            'message' => 'Student has been successfully saved.'
+                        ];
+                    }
+                } else {
                     $response = [
-                        'status' => 'success',
-                        'message' => 'Student has been successfully saved.'
+                        'status' => 'failed',
+                        'message' => 'Student number is already in this course.'
                     ];
                 }
             } catch (Exception $e) { 
                 $response = [
                     'status' => 'failed',
-                    'message' => 'Student has been failed to saved.'
+                    'message' => 'Student has been failed to update.'
                 ];
             }
         } else {
@@ -100,17 +114,32 @@ class StudentsController extends AppController {
         if ($this->request->is(['put', 'post'])) {
             try {
                 $data = $this->request->data;
-                $this->Student->id = $id;
-                if ($this->Student->save($data)) {
+                $student = $this->Student->find('first', [
+                    'conditions' => [
+                        'Student.id <>' => $id,
+                        'Student.course_id' => $data['course_id'],
+                        'Student.number' => $data['number'],
+                        'Student.deleted' => 0
+                    ]
+                ]);
+                if (!$student) {
+                    $this->Student->id = $id;
+                    if ($this->Student->save($data)) {
+                        $response = [
+                            'status' => 'success',
+                            'message' => 'Student has been successfully updated.'
+                        ];
+                    }
+                } else {
                     $response = [
-                        'status' => 'success',
-                        'message' => 'Student has been successfully updated.'
+                        'status' => 'failed',
+                        'message' => 'Student number is already in this course.'
                     ];
                 }
             } catch (Exception $e) {
                 $response = [
                     'status' => 'failed',
-                    'message' => 'Student has been failed to update.'
+                    'message' => $e->getMessage()
                 ];
             }
             $this->response->type('application/json');
@@ -334,5 +363,156 @@ class StudentsController extends AppController {
         }
         $this->response->type('application/json');
         return $this->response->body(json_encode($response));
+    }
+
+    /** 
+     * Upload students using csv
+    */
+    public function upload_csv($id) {
+        $response = [
+            'status' => 'failed',
+            'message' => 'HTTP method not allowed.'
+        ];
+
+        if ($this->request->is('post')) {
+
+            $file = $_FILES;
+            $dataRow = array();
+            $rowCount = 0;
+            $errorContainer = [
+                'Invalid number of columns' => 0,
+                'Student number cannot be blank' => 0,
+                'Student name cannot be blank' => 0
+            ];
+
+            if (!empty($file['file']['name'])) {
+                $fileName = $file['file']['tmp_name'];
+                $type = explode(".",$file['file']['name']);
+
+                if (strtolower(end($type)) == 'csv') {
+                    $fileContents = file_get_contents($fileName);
+                    $handle = fopen("php://memory", "rw");
+                    fwrite($handle, $fileContents);
+                    fseek($handle, 0);
+                    $filePointer = $handle;
+                    $data = [];
+
+                    fgetcsv($filePointer, 10000, ",");
+
+                    while (($line = fgetcsv($filePointer)) !== false) {
+
+                            if (count($line) != 2){
+                                $errorContainer['Invalid number of columns'] = 1;
+                                $rowCount++;
+                                continue;
+                            }
+
+                            $data['number'] = $line[0];
+                            $data['name'] = $line[1]; 
+
+                            if ($data['number'] == null) {
+                                $errorContainer['Student number cannot be blank'] = 1;
+                            }
+
+                            if ($data['name'] == null) {
+                                $errorContainer['Student name cannot be blank'] = 1;
+                            }
+
+                            $rowCount++;
+                            $dataRow[$rowCount] = $data;
+                            $data = [];
+                    }
+
+                    fclose($filePointer);
+                } else {
+                    $response = [
+                        'status' => 'failed',
+                        'message' => 'File is must be CSV.'
+                    ];
+                    $this->response->type('application/json');
+                    return $this->response->body(json_encode($response));
+                }
+            } else {
+                $response = [
+                    'status' => 'failed',
+                    'message' => 'There is no CSV file.'
+                ];
+                $this->response->type('application/json');
+                return $this->response->body(json_encode($response));
+            }
+
+            if ($rowCount == 0) {
+                $response = [
+                    'status' => 'failed',
+                    'message' => 'No data in CSV.'
+                ];
+                $this->response->type('application/json');
+                return $this->response->body(json_encode($response));
+
+            } else {
+
+                $this->Student->clear();
+
+                if(!in_array(1, $errorContainer)){
+
+                    $datasource = $this->Student->getDataSource();
+                    $datasource->begin();
+
+                    try {
+                        foreach ($dataRow as $key => $value) {
+                            $student = $this->Student->find('first', [
+                                'conditions' => [
+                                    'Student.number' => $value['number'],
+                                    'Student.course_id' => $id,
+                                    'Student.deleted' => 0
+                                ]
+                            ]);
+                            $saveData = [
+                                'number' => $value['number'],
+                                'name' => $value['name'],
+                                'course_id' => $id
+                            ];
+                            if ($student) {
+                                $saveData['id'] = $student['Student']['id'];
+                            }
+                            $this->Student->save($saveData);
+                            $this->Student->clear();
+                        }
+                        $datasource->commit();
+                        $response = [
+                            'status' => 'success',
+                            'message' => 'Students have been imported.'
+                        ];
+                        $this->response->type('application/json');
+                        return $this->response->body(json_encode($response));
+                    } catch (Exception $e) {
+                        $response = [
+                            'status' => 'failed',
+                            'message' => 'CSV could not be uploaded.'
+                        ];
+                        $this->response->type('application/json');
+                        return $this->response->body(json_encode($response));
+                    }
+
+                } else {
+                    $errorMessage = 'CSV does not follow correct format: ';
+
+                    foreach ($errorContainer as $key => $value) {
+                        if ($value == 1) {
+                           $errorMessage .= $key . '. ';
+                        }
+                    }
+
+                    $response = [
+                        'status' => 'failed',
+                        'message' => $errorMessage
+                    ];
+                    $this->response->type('application/json');
+                    return $this->response->body(json_encode($response));
+                }
+            }
+            $this->response->type('application/json');
+            return $this->response->body(json_encode($response));
+        }
     }
 }

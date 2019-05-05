@@ -19,6 +19,13 @@ class ActivityResult extends AppModel {
 			'fields' => '',
 			'order' => ''
 		),
+		'Activity' => array(
+			'className' => 'Activity',
+			'foreignKey' => 'activity_id',
+			'conditions' => '',
+			'fields' => '',
+			'order' => ''
+		),
 	);
 
 }

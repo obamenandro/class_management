@@ -21,4 +21,14 @@ class Student extends AppModel {
     )
   );
 
+  public $hasMany = [
+      'ActivityResult' => array(
+          'className' => 'ActivityResult',
+          'foreignKey' => 'student_id',
+          'conditions' => '',
+          'fields' => '',
+          'order' => ''
+      ),
+  ];
+
 }
